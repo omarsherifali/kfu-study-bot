@@ -1,8 +1,11 @@
 import telebot
 from telebot import types
 
-BOT_TOKEN = '7689783688:AAEPJYMnkbzX_NPhymN6K2c6rHuaWtX_3dI'
+BOT_TOKEN = '7689783688:AAEPJYMnkbzX_NPhymN6K2c6rHuaWtX_3dI'  # Replace with your real token
 bot = telebot.TeleBot(BOT_TOKEN)
+
+# Anatomy Drive link
+anatomy_link = "https://drive.google.com/drive/folders/1f2Zp7gxWG6XR53JWBZV40YxndP-4ul5k"
 
 # /start
 @bot.message_handler(commands=['start'])
@@ -11,7 +14,7 @@ def start(message):
     markup.add("📘 Semester 1", "📗 Semester 2")
     bot.send_message(message.chat.id, "👋 Welcome to KFU Med Bot!\nChoose a semester:", reply_markup=markup)
 
-# SEMESTER 1
+# Semester 1 Menu
 @bot.message_handler(func=lambda message: message.text == "📘 Semester 1")
 def sem1_menu(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -29,7 +32,7 @@ def sem1_menu(message):
     markup.add(*buttons)
     bot.send_message(message.chat.id, "📘 Semester 1 Subjects:", reply_markup=markup)
 
-# SEMESTER 2
+# Semester 2 Menu
 @bot.message_handler(func=lambda message: message.text == "📗 Semester 2")
 def sem2_menu(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -49,15 +52,21 @@ def sem2_menu(message):
     markup.add(*buttons)
     bot.send_message(message.chat.id, "📗 Semester 2 Subjects:", reply_markup=markup)
 
-# Placeholder replies for each subject
+# Special case: Anatomy links
+@bot.message_handler(func=lambda message: message.text in ["Anatomy – Sem 1", "Anatomy – Sem 2"])
+def anatomy_links(message):
+    bot.send_message(message.chat.id, f"📚 Anatomy Lectures:\n{anatomy_link}")
+
+# All other subjects say "Coming soon"
 @bot.message_handler(func=lambda message: "– Sem" in message.text)
 def subject_soon(message):
-    bot.send_message(message.chat.id, f"{message.text}:\nComing soon 🔧")
+    if "Anatomy" not in message.text:
+        bot.send_message(message.chat.id, f"{message.text}:\nComing soon 🔧")
 
 # Back to main menu
 @bot.message_handler(func=lambda message: message.text == "🔙 Back to Main")
 def back_to_main(message):
     start(message)
 
-# Keep the bot running
+# Keep bot running
 bot.polling()
